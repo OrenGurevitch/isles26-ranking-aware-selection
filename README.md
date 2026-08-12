@@ -5,8 +5,7 @@ segmentation from native-space T1-weighted MRI, on ATLAS v3.0, N = 1,453.
 
 Every design choice here was made against the challenge's ranking rule rather than against Dice, and
 the two disagree often enough to change what gets submitted. The loss we ship scores a *lower* median
-Dice than the arm it beats. We keep a component filter that Dice alone would have discarded. On the
-binarisation threshold the two criteria prefer opposite directions.
+Dice than the arm it beats, and we keep a component filter that Dice alone would have discarded.
 
 ## The method
 
@@ -46,21 +45,14 @@ against a verbatim copy of their evaluation code, kept as `references/isles26_ev
 | `frozen_isles/evaluate` | scoring a cohort and comparing models |
 | `frozen_isles/splits` | folds stratified by centre × lesion size × chronicity |
 | `frozen_isles/data` | reading the ATLAS tree and its per-subject metadata |
-| `frozen_isles/nifti` | native-space geometry, and masks whose dtypes disagree |
+| `frozen_isles/nifti` | reading and writing masks in native space |
 | `frozen_isles/postprocess` | the minimum-component-size filter, applied after thresholding |
 | `frozen_isles/gcio` | the Grand Challenge container boundary |
 | `container/` | the submission entrypoint and its Dockerfile |
 | `scripts/`, `slurm/` | the analyses behind the reported numbers, and the cluster jobs that ran them |
 
-The Python package is called `frozen_isles` because the work began as a frozen-features experiment.
-That arm was tested, lost to nnU-Net, and is not part of what we submit or describe here.
-`container/probe.py` carries no model; it checks the platform's input and output contract, and
-`frozen_isles/gcio/test.py` exercises it end to end.
-
-The `slurm/` scripts carry the account, paths and walltimes of the cluster they ran on. They are the
-record of what was actually run rather than a portable pipeline, so expect to edit every `#SBATCH`
-line. A few source comments cite an internal project record that is not part of this repository; they
-are kept because they say where a number came from.
+The `slurm/` scripts carry the account, paths and walltimes of the cluster they ran on, so expect to
+edit every `#SBATCH` line.
 
 ## Reproducing
 
@@ -89,9 +81,7 @@ unzip isles26-nnunet-weights.zip -d container/resources_nnunet/
 docker build --platform=linux/amd64 -f container/Dockerfile.nnunet -t isles26-nnunet .
 ```
 
-`docker build` fails without them by design, because the container has no network at inference time and
-the model is copied in at build time. To train the weights instead of downloading them, run
-`slurm/nnunet_train.sh` and stage the result:
+To train the weights yourself instead, run `slurm/nnunet_train.sh` and stage the result:
 
 ```bash
 uv run python scripts/stage_nnunet_container_weights.py \
@@ -99,11 +89,10 @@ uv run python scripts/stage_nnunet_container_weights.py \
     --folds all
 ```
 
-The Dockerfile regenerates the trainer class during the build, and the image will not work without that
-step. nnU-Net reads the trainer name out of the checkpoint and imports it by name, and
-`nnUNetTrainerDiceTopK10Loss_1000epochs` is the cross product of an epoch variant and a loss variant.
-nnU-Net ships those separately but not together, so a stock install raises at model load, before any
-case runs.
+The Dockerfile regenerates the trainer class during the build. Do not remove that step: nnU-Net reads
+the trainer name from the checkpoint and imports it, and `nnUNetTrainerDiceTopK10Loss_1000epochs`
+combines an epoch variant with a loss variant, which nnU-Net ships separately but not together. A
+stock install raises at model load.
 
 `scripts/verify_container_nnunet.py` checks the container against nnU-Net's own predictions. The floor
 is 0.95 agreement; a wrong axis order lands near zero.

@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# The trained model, fetched from the Release rather than tracked here.
+container/resources_nnunet/
