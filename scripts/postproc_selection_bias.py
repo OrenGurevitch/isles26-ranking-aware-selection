@@ -15,10 +15,10 @@ one, and using a single five-way ranking gives 0.1072 instead:
 Selecting and measuring on the same subjects inflates the advantage. Partitioning the cohort into a
 selection half and a disjoint evaluation half removes that, and the gap between the two is the bias.
 
-⚠️ **No rescoring happens here.** `sweep_postprocess_by_band.py` already scored every setting over
+**No rescoring happens here.** `sweep_postprocess_by_band.py` already scored every setting over
 every subject and kept the per-subject values, which is what makes this cheap enough to run inline.
 
-⚠️ **The estimate is of the SELECTION procedure, not of a particular threshold.** A high agreement rate
+**The estimate is of the SELECTION procedure, not of a particular threshold.** A high agreement rate
 would mean the winner is stable; a low one means the procedure picks near-ties and the specific
 constant should not be reported as tuned.
 

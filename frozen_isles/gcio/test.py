@@ -339,7 +339,7 @@ class _BlobAndSpeck:
 
         probability = np.zeros(image.GetSize(), dtype=np.float32)
         probability[5:11, 5:11, 5:11] = 0.9       # 216 voxels, comfortably above the filter
-        # ⚠️ Kept 4 voxels clear of the blob. Components are labelled with 26-CONNECTIVITY, so a speck
+        # Kept 4 voxels clear of the blob. Components are labelled with 26-CONNECTIVITY, so a speck
         # one voxel diagonally from the blob is part of it and the filter would never see it.
         probability[0:2, 0:2, 0:2] = 0.9          # 8 voxels, below the filter
         return probability

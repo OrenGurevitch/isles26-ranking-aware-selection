@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument("--soft", nargs="*", default=[], metavar="NAME=DIR",
                         help="optional NAME=DIR pairs of probability maps; PR-AUC needs these")
     parser.add_argument("--min-voxels", type=int, default=0,
-                        help="drop predicted components smaller than this. ⚠️ 0 scores the model's RAW "
+                        help="drop predicted components smaller than this. 0 scores the model's RAW "
                              "output; the submitted container ships 25, so leaving this at 0 reports a "
                              "different system from the one submitted")
     parser.add_argument("--closing-radius", type=int, default=0)
@@ -57,7 +57,7 @@ def main() -> None:
     scores_by_model = {}
     for pair in args.predictions:
         name, directory = pair.split("=", 1)
-        # ⚠️ flush=True on every progress line. panoptica takes ~8 s/subject, so an arm is ~40 min of
+        # flush=True on every progress line. panoptica takes ~8 s/subject, so an arm is ~40 min of
         # silence, and python block-buffers stdout when it is redirected to a file — which made a
         # healthy run indistinguishable from a hang for 52 minutes (job 207694). Announcing the arm
         # BEFORE scoring it is the point: a line only at the end tells you nothing while you wait.

@@ -13,7 +13,7 @@
 #   sbatch slurm/nnunet_score.sh NAME=/path/to/fold_0/validation [NAME=...]
 #   sbatch --export=ALL,MIN_VOXELS=25 slurm/nnunet_score.sh NAME=...
 #
-# ⚠️ POST-PROCESSING DEFAULTS TO NONE, and the container ships `min_voxels=25`. Scoring raw output
+# POST-PROCESSING DEFAULTS TO NONE, and the container ships `min_voxels=25`. Scoring raw output
 # while describing a filtered system is the 2026-08-05 defect: it understated lesion-F1 by 0.095,
 # because a component filter moves the LESION-WISE metrics, which is where our numbers are weakest.
 # The default stays 0 so every past invocation still means what its log says; pass `MIN_VOXELS=25`
@@ -24,18 +24,18 @@
 # the ResEncL runs or the leave-centres-out dataset, the two things we most need to score. An
 # explicit path cannot go stale as the matrix of plans x datasets grows.
 #
-# ⚠️ SCORE EVERY MODEL YOU WANT RANKED IN ONE CALL: rank-then-aggregate is a comparison ACROSS models,
+# SCORE EVERY MODEL YOU WANT RANKED IN ONE CALL: rank-then-aggregate is a comparison ACROSS models,
 # so scoring them separately yields medians but no ranking.
 #
-# ⚠️ THIS IS THE WHOLE POINT: the comparison is decided by `frozen_isles.metrics` -- the organizers'
+# THIS IS THE WHOLE POINT: the comparison is decided by `frozen_isles.metrics` -- the organizers'
 # own libraries, the same code that scores every probe number -- and ranked by rank-then-aggregate,
 # never by nnU-Net's own Dice, which uses a different implementation on a different grid.
 #
-# ⚠️ Soft maps are exported first because PR-AUC is one of the five ranked metrics and is defined on
+# Soft maps are exported first because PR-AUC is one of the five ranked metrics and is defined on
 # the probability map. Falling back to the binary mask caps nnU-Net's PR-AUC and would understate it
 # in OUR favour -- a worse comparison than none.
 #
-# ⚠️ Walltime has TWO costs, and sizing from panoptica alone is what made a 3 h invocation too tight:
+# Walltime has TWO costs, and sizing from panoptica alone is what made a 3 h invocation too tight:
 #   export     ~13 min per arm  (skipped when the soft maps are already complete -- see below)
 #   panoptica  ~8 s per subject, so ~40 min per arm over 291
 # Three arms from cold is therefore ~41 min + ~2 h = ~2.7 h, not 2 h. **A user cannot RAISE a walltime**
@@ -88,7 +88,7 @@ for spec in "$@"; do
     NAMES+=("$run")
 done
 
-# ⚠️ Every model must be scored on the SAME subjects, and REFS below is whichever run came last. A
+# Every model must be scored on the SAME subjects, and REFS below is whichever run came last. A
 # stratified fold and a leave-centres-out fold hold DIFFERENT cohorts, so ranking them together is a
 # category error -- caught here with a readable message rather than downstream as "no prediction for
 # 291 subjects".
@@ -99,7 +99,7 @@ for name in "${NAMES[@]}"; do
 done
 
 echo "=== scoring through frozen_isles.metrics (the organizers' own code) ==="; date
-# ⚠️ One --references directory, so every model is scored on the SAME subjects. Scoring a
+# One --references directory, so every model is scored on the SAME subjects. Scoring a
 # stratified-fold model against a leave-centres-out model is a category error: they hold out
 # different cohorts, and score_cohort refuses a mismatch rather than comparing across them.
 uv run python scripts/score_cohort.py \

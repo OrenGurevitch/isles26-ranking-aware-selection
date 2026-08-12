@@ -52,13 +52,13 @@ THRESHOLD = 0.5
 # **25 is chosen over the equally-ranked 50 because the failure mode is DELETING a real lesion** — of
 # two settings that score the same, take the one that removes less.
 #
-# ⚠️ **That selection describes a model we no longer ship.** At the shipped TopK10 @ 1,000 epochs the
+# **That selection describes a model we no longer ship.** At the shipped TopK10 @ 1,000 epochs the
 # filter is INERT: identical Dice, lesion-F1 and PR-AUC raw against filtered, and |Δvol| 0.0042 mL
 # worse — the longer schedule leaves it nothing to remove. The value stays at 25 because a filter with
 # nothing to remove costs nothing, and because dropping it would be an unmeasured change to a shipped
 # container. Read the paragraph above as how 25 was chosen, never as a claim about the shipped system.
 #
-# ⚠️ Do NOT raise this to 100. That value won an earlier sweep on a 100-subject SELECTION SUBSET and
+# Do NOT raise this to 100. That value won an earlier sweep on a 100-subject SELECTION SUBSET and
 # then LOST to no post-processing on the full fold: it gives an empty prediction to 16 subjects who
 # have a lesion, against 2, and each of those takes the worst rank on every metric at once.
 #
@@ -67,7 +67,7 @@ THRESHOLD = 0.5
 MIN_VOXELS = 25
 CLOSING_RADIUS = 0
 
-# ⚠️ **420, not 600.** The Sanity Check phase page states "a time limit of 7 minutes per case"
+# **420, not 600.** The Sanity Check phase page states "a time limit of 7 minutes per case"
 # [read from the phase's own submission page, 2026-08-02]. Every earlier note in this repository said
 # 10 minutes, from a forum quote ("Dockers are killed after 10 mins"); the phase page is newer, more
 # specific, and is what actually kills the job.
@@ -123,7 +123,7 @@ def run_case(predictor: Predictor) -> int:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[env] device={device} torch={torch.__version__}", flush=True)
 
-    # ⚠️ EVERY step below is guarded, and that is the point of this function's shape. Until
+    # EVERY step below is guarded, and that is the point of this function's shape. Until
     # 2026-08-02 the input lookup, the image read and the metadata read all ran BEFORE the try, so a
     # malformed input raised out of main and the container wrote NO mask, NO probability map and NO
     # results.json — the exact outcome this design exists to prevent, in the one place where it is
@@ -157,7 +157,7 @@ def run_case(predictor: Predictor) -> int:
         # organizers key on the absent file rather than on the exit status — so the printed tree below
         # is the only thing that will explain WHY, and it has to be loud.
         #
-        # ⚠️ **Whether to exit non-zero here is OPEN.** Returning 0 reports success for a case that
+        # **Whether to exit non-zero here is OPEN.** Returning 0 reports success for a case that
         # produced nothing; exiting non-zero would surface it in Grand Challenge's own job view. Which
         # is right depends on whether a failed job costs only its own case, and nobody has verified
         # that. Do not flip it on intuition — it is a shipped container.
@@ -166,7 +166,7 @@ def run_case(predictor: Predictor) -> int:
         return 0
     if volume_image is None:
         # Reached only when the pixel data AND the header are both unreadable, so the true dimensions
-        # are unknowable here. ⚠️ **A 1×1×1 output cannot match the input geometry the challenge
+        # are unknowable here. **A 1×1×1 output cannot match the input geometry the challenge
         # requires**, so whether the evaluator scores it or rejects it as missing is UNVERIFIED — this
         # rung may buy nothing over writing no file at all. It is kept because it costs one voxel and
         # the alternative is raising out of `run_case`, which loses the results.json for the case too.
@@ -195,7 +195,7 @@ def run_case(predictor: Predictor) -> int:
 
     mask = binarise(probability, THRESHOLD)
     raw_voxels, raw_components = int(mask.sum()), component_count(mask)
-    # ⚠️ The MASK is post-processed and the PROBABILITY MAP is written untouched. PR-AUC is computed on
+    # The MASK is post-processed and the PROBABILITY MAP is written untouched. PR-AUC is computed on
     # the soft map, so filtering it would change a metric the filter was never evaluated against — and
     # the sweep that chose these settings scored exactly this way: filtered mask, raw soft map.
     if MIN_VOXELS or CLOSING_RADIUS:

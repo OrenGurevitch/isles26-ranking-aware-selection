@@ -45,7 +45,7 @@ def load_soft(path: Path) -> npt.NDArray[np.float32]:
     `dataobj` — so every copy raised the same type-checker warning, and each was individually harmless
     enough to leave. `_load` asserts the concrete `Nifti1Image`, so the access is typed here once.
 
-    ⚠️ **No thresholding and no validation.** A probability map is legitimately continuous, which is
+    **No thresholding and no validation.** A probability map is legitimately continuous, which is
     exactly what `load_mask` refuses.
     """
     return np.asanyarray(_load(path).dataobj).astype(np.float32)

@@ -4,7 +4,7 @@ The hidden test *"contains data from completely new sites absent from training"*
 and every other number this project holds comes from a split stratified BY CENTRE, where each held-out
 subject shares its centre with the training set. This is the one measurement that removes that.
 
-⚠️ **DO NOT read LOCO fold N against stratified fold 0.** Greedy largest-first packing put each big
+**DO NOT read LOCO fold N against stratified fold 0.** Greedy largest-first packing put each big
 centre in a different LOCO fold, and those centres differ enormously in intrinsic difficulty — R009
 scores 0.369 with its centre IN training, R047 scores 0.860. A fold-level difference therefore
 conflates the generalization penalty with a change in cohort composition, and it would have looked
@@ -21,7 +21,7 @@ difference is whether C's centre appeared in training. That is what
       --loco $R/scored/scores_loco_f0.json $R/scored/scores_loco_f1.json ... \\
       --inventory $DATA/inventory.csv
 
-⚠️ Each `--loco` file may contribute SEVERAL centres, and a centre is only usable when enough of its
+Each `--loco` file may contribute SEVERAL centres, and a centre is only usable when enough of its
 subjects were scored under both models. `--min-paired` drops the rest rather than reporting a Δ over
 three subjects as though it were an estimate.
 """
@@ -72,7 +72,7 @@ def main() -> None:
                         help="scores for each leave-centres-out fold")
     parser.add_argument("--inventory", type=Path, required=True)
     parser.add_argument("--stratified-model", default=None,
-                        help="which model in --stratified, when that file holds several. ⚠️ It must "
+                        help="which model in --stratified, when that file holds several. It must "
                              "be the SAME budget and plans as the LOCO folds, or the Δ measures the "
                              "budget rather than the unseen site")
     parser.add_argument("--metric", default="dice")

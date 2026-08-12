@@ -9,7 +9,7 @@ What this module adds over calling their functions directly: types, a single per
 object, and one evaluator built once (constructing `Panoptica_Evaluator` per subject is pure waste
 over 1453 scans).
 
-⚠️ **panoptica spawns multiprocessing workers.** Any script that calls into here must live in a FILE
+**panoptica spawns multiprocessing workers.** Any script that calls into here must live in a FILE
 and be guarded by `if __name__ == "__main__":`. Calling it from `python - <<EOF` or `python -c` makes
 each spawned child re-import a `__main__` it cannot find, and the process storm hangs — measured at
 over ten minutes for one subject before being killed. This also means nested parallelism needs care
@@ -65,7 +65,7 @@ def pr_auc(
 ) -> float:
     """Voxel-wise PR-AUC over the CONTINUOUS map — thresholding first forfeits this metric.
 
-    ⚠️ The design document and the shipped `eval_utils.py` DISAGREE, in two ways at once, and which
+    The design document and the shipped `eval_utils.py` DISAGREE, in two ways at once, and which
     one runs on the test set is unresolved (see `docs/CHALLENGE.md` and the organizers' forum thread
     "Design document vs. eval_utils.py"). Both are implemented so the gap can be measured instead of
     assumed away:
@@ -126,7 +126,7 @@ class InstanceCounts:
 class InstanceMetrics(NamedTuple):
     """The three instance-derived metrics. A NamedTuple so `a, b, c = ...` still reads correctly.
 
-    ⚠️ Dice is LAST here and FIRST in `SubjectScore`. The orders differ, which is why these are named.
+    Dice is LAST here and FIRST in `SubjectScore`. The orders differ, which is why these are named.
     """
 
     lesion_f1: float
@@ -189,7 +189,7 @@ def score_subject(
     comes from the map. When the mask is simply the thresholded map they are the same thing, which is
     why this defaults to None and the default path is byte-identical to before.
 
-    ⚠️ **They come apart the moment POST-PROCESSING is involved.** Closing gaps and dropping small
+    **They come apart the moment POST-PROCESSING is involved.** Closing gaps and dropping small
     components changes the mask and leaves the probability map untouched, so scoring a post-processed
     submission by re-thresholding its soft map would measure the un-post-processed model — and, worse,
     would make post-processing appear to change PR-AUC, which it cannot.

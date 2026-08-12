@@ -12,7 +12,7 @@ That makes the IoU distribution around 0.25 the thing that sizes every remaining
 - **Subjects just ABOVE are a RISK nobody has counted.** They are one bad post-processing choice away
   from scoring zero, and a change that helps the median can silently push them off.
 
-⚠️ **This computes the GLOBAL foreground IoU**, not panoptica's per-instance matching IoU. For a
+**This computes the GLOBAL foreground IoU**, not panoptica's per-instance matching IoU. For a
 single-lesion case the two coincide; for a multi-lesion case they do not, so read this as sizing the
 population near the cliff rather than as predicting any individual subject's fate.
 

@@ -15,10 +15,10 @@
 #
 #   sbatch slurm/analyse_arm.sh [ARM]    # ARM defaults to plain500
 #
-# ⚠️ CPU ONLY. panoptica is the entire cost (~8 s/subject, so ~40 min over 291) and a GPU would sit
+# CPU ONLY. panoptica is the entire cost (~8 s/subject, so ~40 min over 291) and a GPU would sit
 # idle behind a longer queue for nothing. Two hours is sized from that, from the slow end.
 #
-# ⚠️ Runs on the SHIPPED predictions -- threshold 0.5 then `min_voxels=25` -- because the question is
+# Runs on the SHIPPED predictions -- threshold 0.5 then `min_voxels=25` -- because the question is
 # about what the challenge would score, not about raw model output. Measuring before post-processing
 # would overstate the precision problem the filter exists to fix.
 set -uo pipefail
@@ -49,7 +49,7 @@ if [ "$STATUS" -ne 0 ]; then
     exit "$STATUS"
 fi
 echo "=== false-positive geometry: do the spurious components float or over-grow? ==="
-# ⚠️ RUN AT min_voxels=0, UNLIKE the two above. The question is what the RAW model invents; applying
+# RUN AT min_voxels=0, UNLIKE the two above. The question is what the RAW model invents; applying
 # the filter first would remove the small spurious components this analysis exists to count, and the
 # manuscript quotes it as "in the unfiltered output" for exactly that reason. State the setting beside
 # any number taken from it -- mixing it with the min_voxels=25 figures above is the error that reached

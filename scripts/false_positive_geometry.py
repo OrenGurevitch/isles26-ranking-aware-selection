@@ -17,7 +17,7 @@ one we have:
 - **Over-growth** is not removable by size at all: the spurious voxels are attached to a real lesion,
   so a size filter either keeps them or deletes the lesion with them.
 
-⚠️ **A cluster is "spurious" iff it has ZERO overlap with the reference.** An over-grown lesion is
+**A cluster is "spurious" iff it has ZERO overlap with the reference.** An over-grown lesion is
 therefore NOT counted as spurious — it is one matched component that is too big — which is exactly the
 distinction this script exists to draw. The two populations are reported separately.
 

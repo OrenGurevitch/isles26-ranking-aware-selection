@@ -56,7 +56,7 @@ CANDIDATE_OUTPUT_SOCKETS: tuple[str, ...] = (
     "infarct-segmentation",
 )
 
-# ✅ **RESOLVED 2026-08-02 from the Sanity Check phase's own submission page**, which lists the
+# **RESOLVED 2026-08-02 from the Sanity Check phase's own submission page**, which lists the
 # required outputs as **"Stroke Lesion Segmentation"** and **"Lesion Probability Map"** — and says an
 # algorithm "need[s] to implement ALL of the following input-output combinations". So the probability
 # map is REQUIRED, not optional, and PR-AUC really is one of the five scored metrics. The design
@@ -99,16 +99,16 @@ def find_input_image(root: Path | None = None) -> Path:
 def read_metadata(root: Path | None = None) -> dict[str, object]:
     """The per-case JSON — DAYS_POST_STROKE, CHRONICITY, CENTER.
 
-    ✅ **CONFIRMED from the sanity-phase log, 2026-08-02**: the file is `/input/stroke-metadata.json`,
+    **CONFIRMED from the sanity-phase log, 2026-08-02**: the file is `/input/stroke-metadata.json`,
     at the TOP level and not under `images/`. Observed contents, one line each:
 
         {'CENTER': 'SOOP', 'CHRONICITY': 1,    'DAYS_POST_STROKE': None}
         {'CENTER': 'R001', 'CHRONICITY': None, 'DAYS_POST_STROKE': 471.0}
 
-    ⚠️ **A case may carry CHRONICITY or DAYS_POST_STROKE and not both** — one of the two sanity cases
+    **A case may carry CHRONICITY or DAYS_POST_STROKE and not both** — one of the two sanity cases
     had each. Any consumer must handle either being None.
 
-    ⚠️ **`/input` also holds `inputs.json`, which is the platform's INTERFACE descriptor, not ours.**
+    **`/input` also holds `inputs.json`, which is the platform's INTERFACE descriptor, not ours.**
     This used to merge every `*.json` it found, and was saved from absorbing that file only by the
     `isinstance(dict)` guard below — GC ships it as an array. That is luck, not design, so the named
     file is preferred now and the merge is the fallback.
@@ -236,7 +236,7 @@ def write_results_json(
     Omitting it is not a degraded submission, it is a failed one: the platform learns about outputs
     from this file, not by scanning directories. Shape copied from the organizers' template.
 
-    ⚠️ **BOTH outputs are declared, because the phase requires both.** The Sanity Check submission page
+    **BOTH outputs are declared, because the phase requires both.** The Sanity Check submission page
     states an algorithm "need[s] to implement ALL of the following input-output combinations" and
     lists **Stroke Lesion Segmentation** *and* **Lesion Probability Map** [read 2026-08-02]. This
     function used to announce the mask alone while the container wrote both files — the platform would

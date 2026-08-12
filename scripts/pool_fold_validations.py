@@ -15,7 +15,7 @@ Then score it as a single arm — `slurm/nnunet_score.sh cv5_topk10_1000=<out>`.
 and no ranking, which is correct: a rank is a comparison across models and there is nothing here to
 compare against.
 
-⚠️ **The disjointness check is the point of this script.** Symlinking five directories together is a
+**The disjointness check is the point of this script.** Symlinking five directories together is a
 one-liner; what a one-liner will not tell you is that two folds predicted the same subject, which
 would mean the splits are wrong and every pooled number is quietly measuring the wrong thing.
 """

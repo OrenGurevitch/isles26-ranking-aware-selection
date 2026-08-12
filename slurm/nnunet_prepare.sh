@@ -14,16 +14,16 @@
 #
 #   sbatch slurm/nnunet_prepare.sh
 #
-# ⚠️ WALLTIME IS A GUESS AND THIS JOB EXISTS PARTLY TO REPLACE IT WITH A MEASUREMENT. frozen-wmh
+# WALLTIME IS A GUESS AND THIS JOB EXISTS PARTLY TO REPLACE IT WITH A MEASUREMENT. frozen-wmh
 # recorded "1:06 on 8 CPU cores" for 50 subjects without an unambiguous unit, and ISLES has 29x the
 # cases at ~4x the voxels. 8 h at 16 cores is sized from the SLOW reading of that; the log prints
 # wall-clock for each stage so the next run can be sized from evidence. Over-requesting a CPU job
 # costs backfill position only.
 #
-# ⚠️ DISK: preprocessed 3d_fullres at ~1 mm is roughly 46 MB/case plus segmentation, so expect ~80 GB
+# DISK: preprocessed 3d_fullres at ~1 mm is roughly 46 MB/case plus segmentation, so expect ~80 GB
 # for one configuration and ~165 GB if `2d` is planned too. /scratch was at 9.1 of 20 TB.
 #
-# ⚠️ The 353.6 M-voxel outlier (0.5 mm acquisitions) is resampled DOWN to ~44 M, but peak memory is
+# The 353.6 M-voxel outlier (0.5 mm acquisitions) is resampled DOWN to ~44 M, but peak memory is
 # set by the pre-resampling array -- hence 64 G rather than the 16 G this would otherwise need.
 set -uo pipefail
 
@@ -65,10 +65,10 @@ else
     date
 fi
 
-# ⚠️ `--verify_dataset_integrity` reads every case, so it runs ONCE -- on the first planner. It is what
+# `--verify_dataset_integrity` reads every case, so it runs ONCE -- on the first planner. It is what
 # catches a geometry or label problem before 1,453 cases are preprocessed on a bad premise; a second
 # planner over the same raw data has nothing new to verify. `VERIFY=1` forces it back on.
-# ⚠️ splits_final.json is written by stage 1 into $nnUNet_preprocessed/<dataset>. Confirm it SURVIVES
+# splits_final.json is written by stage 1 into $nnUNet_preprocessed/<dataset>. Confirm it SURVIVES
 # this step -- if the planner ever clears that directory, nnU-Net silently falls back to its own
 # KFold and every downstream number is trained on our held-out subjects.
 FINGERPRINT=$nnUNet_preprocessed/$DATASET_DIR/dataset_fingerprint.json

@@ -5,7 +5,7 @@ per subject. `metric_arrays` reshapes several models' scores into the `(n_models
 `frozen_isles.ranking` consumes. Nothing here decides what a good model is — that is the ranking's job,
 and it is not mean Dice.
 
-⚠️ **panoptica spawns multiprocessing workers**, so any caller must be a file with an
+**panoptica spawns multiprocessing workers**, so any caller must be a file with an
 `if __name__ == "__main__":` guard. From a heredoc or `python -c`, each spawned child re-imports a
 `__main__` it cannot find and the process storm hangs — measured at over ten minutes on ONE subject.
 `scripts/score_cohort.py` is the guarded entry point.
@@ -55,7 +55,7 @@ def score_cohort(
     subject has none, its binary mask stands in — which caps PR-AUC at what a thresholded map can
     achieve, so it is a fallback for development, not for a submission.
 
-    ⚠️ **`min_voxels` and `closing_radius` default to 0, which scores the model's RAW output.** The
+    **`min_voxels` and `closing_radius` default to 0, which scores the model's RAW output.** The
     submitted container ships `min_voxels=25`, so a number reported without them describes a different
     system from the one submitted — which is exactly what happened to this project's headline row
     (found 2026-08-05). Pass the shipped settings to score the shipped configuration. The filter is
@@ -79,7 +79,7 @@ def score_cohort(
             binary = postprocess(binary, min_voxels=min_voxels, closing_radius=closing_radius) > 0
         soft_path = (soft_predictions or {}).get(subject_id)
         soft = binary.astype(np.float32) if soft_path is None else _load_soft(soft_path)
-        # ⚠️ The MASK drives the four mask-based metrics and the SOFT MAP drives PR-AUC. Until
+        # The MASK drives the four mask-based metrics and the SOFT MAP drives PR-AUC. Until
         # 2026-08-02 this loaded `binary` and then discarded it whenever a soft map was supplied, so
         # every metric came from re-thresholding the map. That is identical when the mask IS the
         # thresholded map — nnU-Net's exported mask is its own argmax — and silently wrong for a
@@ -168,7 +168,7 @@ def rank(scores_by_model: Mapping[str, Mapping[str, SubjectScore]]) -> dict[str,
 def as_subject_list(paths: Sequence[Path], *, suffix: str) -> dict[str, Path]:
     """Map filenames to subject ids by their `sub-XXXX` prefix.
 
-    ⚠️ The extension is stripped BEFORE splitting on `_`, because a file named for the subject alone
+    The extension is stripped BEFORE splitting on `_`, because a file named for the subject alone
     has no underscore at all and `"sub-r001s002.nii.gz".split("_")[0]` returns the whole filename.
     Our own BIDS-style masks always carry a `_space-orig...` suffix, so this went unnoticed until
     nnU-Net's predictions — plain `sub-XXXX.nii.gz` — keyed on the extension and matched none of the
@@ -209,7 +209,7 @@ def sweep_threshold(
     competing "model" over identical cases, which is exactly what `rank_then_aggregate` is for — and
     what selecting on mean Dice would get wrong in the usual way.
 
-    ⚠️ Choose the threshold on VALIDATION only. Picking it on the data you then report is test-peeking,
+    Choose the threshold on VALIDATION only. Picking it on the data you then report is test-peeking,
     and the hidden test is scored once.
     """
     assert set(references) == set(soft_predictions), "references and predictions cover different subjects"

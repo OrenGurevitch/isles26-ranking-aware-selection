@@ -4,7 +4,7 @@ The test phase allows ONE submission and we do not know the platform's socket na
 arrives, what format the image is in, or what hardware we get. The sanity phase allows more than one,
 so this container's job is to come back with those answers.
 
-⚠️ This said "unlimited" until 2026-08-01 and that contradicted the challenge record: `FIXME.md` has
+This said "unlimited" until 2026-08-01 and that contradicted the challenge record: `FIXME.md` has
 **2 attempts per day** (relayed by the user) and `docs/CHALLENGE.md` has "multiple attempts allowed".
 The difference is not cosmetic — the reason to spend the FIRST attempt on this probe rather than on
 the real container is precisely that attempts are rationed. `docs/CHALLENGE.md` owns the number; do

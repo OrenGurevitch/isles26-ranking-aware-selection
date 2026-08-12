@@ -11,18 +11,18 @@
 #
 #   sbatch slurm/score_shipped.sh
 #
-# 🔴 **Why this exists.** `scripts/score_cohort.py` defaulted to no post-processing, so every headline
+# **Why this exists.** `scripts/score_cohort.py` defaulted to no post-processing, so every headline
 # number in `docs/RESULTS.md` was the model's RAW output while `container/run.py` ships
 # `MIN_VOXELS = 25` and the manuscript's Methods describe removing components under 25 voxels. Found
 # 2026-08-05: the reported row was exactly the `min_voxels=0` entry of `postproc_plain500.json`.
 #
-# ⚠️ The gap falls on the LESION-WISE metrics, which is where the reported number is weakest — at
+# The gap falls on the LESION-WISE metrics, which is where the reported number is weakest — at
 # `min_voxels=100` on the full fold, lesion-F1 moved 0.5714 → 0.6667 while Dice moved 0.7683 → 0.7645.
 #
-# ⚠️ CPU ONLY. panoptica is the whole cost, ~8 s/subject, so THREE arms over 291 is ~2 h; the wall is
+# CPU ONLY. panoptica is the whole cost, ~8 s/subject, so THREE arms over 291 is ~2 h; the wall is
 # 4 h, sized from the slow end as the standing rule requires.
 #
-# 🔴 **`topk10_1000` added 2026-08-06, and it is the reason to rerun the whole file rather than append.**
+# **`topk10_1000` added 2026-08-06, and it is the reason to rerun the whole file rather than append.**
 # Job 292882 compared `topk10_1000` against `plain1000` on the RAW output — its own log says
 # "[config] scoring the RAW model output — the container ships min_voxels=25". The filter is not
 # neutral: at 500 epochs it costs the acute band 0.130 median Dice (`docs/RESULTS.md`). A recipe

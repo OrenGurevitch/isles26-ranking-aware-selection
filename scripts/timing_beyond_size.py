@@ -11,11 +11,11 @@ asks the cheap prior question. `docs/RESULTS.md` establishes that acute cases fa
 **lesion size wearing a clock**. If days predicts nothing once true lesion size is known, an input
 channel carrying days has nothing to teach the network.
 
-⚠️ **This is a SCREEN, not a proof.** It can kill the idea cheaply. Passing it would NOT establish that
+**This is a SCREEN, not a proof.** It can kill the idea cheaply. Passing it would NOT establish that
 a conditioning channel works: a network could exploit an association this correlation cannot see, and a
 scalar broadcast as a constant channel is a weak conditioning mechanism regardless.
 
-⚠️ **Reference volume is the control on purpose.** Controlling for PREDICTED volume would answer a
+**Reference volume is the control on purpose.** Controlling for PREDICTED volume would answer a
 different question — whether timing tells us anything the model's own output does not already imply —
 which is the right control for a post-hoc rule and the wrong one for an input channel.
 
@@ -173,7 +173,7 @@ def main() -> None:
     print(f"          95% CI over {BOOTSTRAP_DRAWS} subject bootstraps: [{low:+.4f}, {high:+.4f}]")
     print("          → CI containing 0 means timing adds nothing measurable beyond lesion size here\n")
 
-    # 🔴 Acute subjects concentrate in particular centres, so the association above could be site
+    # Acute subjects concentrate in particular centres, so the association above could be site
     # difficulty rather than lesion age. Adding site as a control separates them.
     site_labels = [centre_of[s] for s in subjects]
     site_columns = one_hot(site_labels)
@@ -197,7 +197,7 @@ def main() -> None:
           f"[{site_low:+.4f}, {site_high:+.4f}]")
     print("          → if this collapses toward 0, the timing effect was site difficulty\n")
 
-    # 🔴 A collapse has TWO explanations and they are not the same finding: either site difficulty
+    # A collapse has TWO explanations and they are not the same finding: either site difficulty
     # really explains the timing effect, or acute subjects sit in so few centres that site indicators
     # absorb them by construction. Only centres holding BOTH acute and later subjects can identify a
     # within-site timing effect at all, so count them before reading the number above.

@@ -47,7 +47,7 @@ def per_case_ranks(
     corresponding metrics to be set to the worst possible value", so a container that dies on one
     subject pays for that subject.
 
-    ⚠️ **That rule is about a MISSING RESULT, and there is one NaN here that is not one.** The design
+    **That rule is about a MISSING RESULT, and there is one NaN here that is not one.** The design
     document also says an empty ground truth makes AP *undefined*, sets it to NaN, and **excludes it
     from the AP aggregation** — excluded, not scored worst. `metrics.pr_auc` only produces such a NaN
     under `convention="design"`; the default `"shipped"` returns 1.0 or 0.0 and never NaN, so no

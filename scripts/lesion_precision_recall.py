@@ -18,11 +18,11 @@ Reports both aggregations, because they answer different questions:
   MACRO   median of per-subject values   ->  what a typical subject looks like, which is what
                                              rank-then-aggregate actually rewards
 
-⚠️ Post-processing is applied first, so this measures the SHIPPED predictions rather than raw output —
+Post-processing is applied first, so this measures the SHIPPED predictions rather than raw output —
 `min_voxels=25` already removes small invented clusters, and measuring before it would overstate the
 precision problem it exists to fix.
 
-⚠️ Panoptica costs ~8 s/subject, so this is CPU work: ~40 min per arm over 291 subjects.
+Panoptica costs ~8 s/subject, so this is CPU work: ~40 min per arm over 291 subjects.
 
   uv run python scripts/lesion_precision_recall.py --references .../references_plain500 \\
       --soft .../soft_plain500 --out .../lesion_pr_plain500.json

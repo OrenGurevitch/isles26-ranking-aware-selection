@@ -9,7 +9,7 @@ The shipped recipe is TopK10 @ 1,000 epochs on all 1,453 subjects, so the staged
   uv run python scripts/stage_nnunet_container_weights.py \\
       --model $R/nnUNetTrainerDiceTopK10Loss_1000epochs__nnUNetPlans__3d_fullres --folds all
 
-⚠️ Stage only the folds the container will USE. `container/inference_nnunet.py` names them in
+Stage only the folds the container will USE. `container/inference_nnunet.py` names them in
 `FOLDS`, and a fold present on disk but absent from that tuple is dead weight in the image, while the
 reverse is a crash at submission time — so the two are checked against each other here.
 """

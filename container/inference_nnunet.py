@@ -4,14 +4,14 @@ The case loop and the degradation ladder are shared with the probe entrypoint (`
 What is here is the part nnU-Net insists on owning: reading the volume through its OWN
 `image_reader_writer`, and sliding-window prediction with the plans it was trained under.
 
-⚠️ **The reader is not interchangeable.** `predict_single_npy_array` documents that a disturbed axis
+**The reader is not interchangeable.** `predict_single_npy_array` documents that a disturbed axis
 ordering silently produces bad results — no crash, just a worse score. `nnUNetPlans.json` names
 `SimpleITKIO` for this dataset, so that class reads the input here, and the array it returns was
 confirmed on 2026-08-02 to match `sitk.GetArrayFromImage` exactly, i.e. [z, y, x]. The one transpose
 below converts that to the [x, y, z] the writer expects, and `run_case` asserts the result against
 `GetSize()` rather than trusting it.
 
-⚠️ **Test-time mirroring is 8 forward passes per tile.** It is what nnU-Net's own reported numbers
+**Test-time mirroring is 8 forward passes per tile.** It is what nnU-Net's own reported numbers
 include, so it is on by default; `ISLES_NNUNET_TTA=0` turns it off if the T4 budget turns out not to
 hold. Which of those is true is a MEASUREMENT — the sanity-check phase reports the per-case time on
 the real hardware, and this file prints its own.
@@ -30,11 +30,11 @@ from container.run import run_case
 # trained fold on the cluster — the check that proves the reader and the transpose, which is the
 # whole risk here. In the image the variable is unset and the default applies.
 MODEL_DIR = os.environ.get("ISLES_NNUNET_DIR", "/opt/app/resources/nnunet")
-# ⚠️ `"all"` is nnU-Net's own name for a model trained on EVERY subject with nothing held out — the
+# `"all"` is nnU-Net's own name for a model trained on EVERY subject with nothing held out — the
 # mode the shipped model uses, because the hidden test set is our held-out set. `use_folds` accepts
 # strings as well as ints, and the directory it looks for is literally `fold_all`.
 #
-# ⚠️ **Do NOT stage all-data weights into a `fold_0` directory to avoid changing this.** The path
+# **Do NOT stage all-data weights into a `fold_0` directory to avoid changing this.** The path
 # would then claim a held-out model while holding one trained on everything, and the only symptom
 # would be a number nobody can reproduce.
 FOLDS: tuple[int | str, ...] = ("all",)

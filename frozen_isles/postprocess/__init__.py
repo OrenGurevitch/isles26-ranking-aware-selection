@@ -16,7 +16,7 @@ Two operations, deliberately the two that address fragmentation and nothing else
 Both operate on the BINARY mask, in 3D, with 26-connectivity, matching how the organizers' instance
 metrics label components.
 
-⚠️ **Neither can raise voxel Dice much, and that is fine.** They target instance structure. Judge them
+**Neither can raise voxel Dice much, and that is fine.** They target instance structure. Judge them
 by `rank_then_aggregate` over all five metrics, never by Dice alone.
 """
 
@@ -55,7 +55,7 @@ def close_gaps(mask: npt.NDArray, *, radius: int) -> npt.NDArray:
     across this cohort (74 distinct spacings), so a mm radius would mean different things per subject
     and make the sweep uninterpretable.
 
-    ⚠️ **Closing is extensive in the interior but ERODES within `radius` of the volume's faces**,
+    **Closing is extensive in the interior but ERODES within `radius` of the volume's faces**,
     because `scipy.ndimage`'s erosion pads with 0. A lesion reaching the FOV boundary loses voxels in
     that shell, and the shell grows with the radius.
     Measured 2026-08-02 and pinned by a test; `border_value=1` removes the effect and changes every

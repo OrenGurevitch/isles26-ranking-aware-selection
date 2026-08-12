@@ -8,7 +8,7 @@ at 1000 epochs costs about 7 GPU-h per arm to answer a question a quarter of tha
 frozen-wmh solved the same problem by generating the trainer, and this does it here: write a subclass
 that sets `num_epochs` and nothing else, into the package nnU-Net searches.
 
-⚠️ **It writes into the INSTALLED nnunetv2 package**, which under `uv run --with` lives in a cache
+**It writes into the INSTALLED nnunetv2 package**, which under `uv run --with` lives in a cache
 directory that can be rebuilt. That is why this runs at job start rather than once: the generated file
 is disposable and must be recreated whenever the environment is. It sets `num_epochs` and touches
 nothing else, so an arm differs from its parent in budget alone.
@@ -41,7 +41,7 @@ from nnunetv2.training.nnUNetTrainer.variants.{module} import {parent}
 
 
 class {name}({parent}):
-    # ⚠️ THE SIGNATURE MUST BE EXPLICIT. nnU-Net's base trainer introspects it:
+    # THE SIGNATURE MUST BE EXPLICIT. nnU-Net's base trainer introspects it:
     #     for k in inspect.signature(self.__init__).parameters.keys():
     #         self.my_init_kwargs[k] = locals()[k]
     # so `*args, **kwargs` makes it look for locals named "args" and "kwargs" and die on

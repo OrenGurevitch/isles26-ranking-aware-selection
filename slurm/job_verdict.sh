@@ -10,7 +10,7 @@
 #
 #   sbatch --dependency=afterany:<JOBID> slurm/job_verdict.sh <JOBID> [EXPECTED_ARTIFACT ...]
 #
-# 🔴 **Why this runs here and not on the laptop.** On 2026-08-10 a local pace monitor watched an
+# **Why this runs here and not on the laptop.** On 2026-08-10 a local pace monitor watched an
 # overnight job, the MacBook entered Clamshell Sleep at 23:56:43, and every `ssh` after that returned
 # nothing. It printed `state='UNKNOWN'` 37 times over nine hours and never fired its terminal branch.
 # The job had finished at 02:23. Five earlier monitor failures were all about what the watcher
@@ -18,7 +18,7 @@
 # `afterany` fires on COMPLETED, FAILED, TIMEOUT and CANCELLED alike, so the verdict is written
 # whatever happens.
 #
-# ⚠️ **It checks ARTIFACTS, not status.** `COMPLETED` has lied here repeatedly: job 677958 reported
+# **It checks ARTIFACTS, not status.** `COMPLETED` has lied here repeatedly: job 677958 reported
 # COMPLETED 0:0 while nnU-Net raised at model load, and job 207694 reported FAILED with valid output.
 # A verdict that reads sacct and stops would inherit exactly that.
 set -uo pipefail

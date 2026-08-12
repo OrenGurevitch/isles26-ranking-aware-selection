@@ -13,18 +13,18 @@
 #   EPOCHS=5   sbatch --time=01:00:00 --job-name=nnu_timing slurm/nnunet_train.sh 0 3d_fullres
 #   EPOCHS=100 sbatch slurm/nnunet_train.sh 0 3d_fullres
 #
-# ⚠️ RUN THE 5-EPOCH TIMING JOB FIRST, and size everything else from it. The per-epoch cost here is
+# RUN THE 5-EPOCH TIMING JOB FIRST, and size everything else from it. The per-epoch cost here is
 # PREDICTED from frozen-wmh's 0.60 GPU-h/fold at 100 epochs, on the argument that nnU-Net sizes its
 # patch to a fixed memory budget so per-iteration cost transfers -- that argument has not been
 # checked on this data, and sizing a long run from an unchecked prediction is what the standing rule
 # forbids.
 #
-# ⚠️ EPOCHS IS PART OF THE RESULT, NOT A KNOB TO HIDE. nnU-Net's PolyLR anneals to zero over
+# EPOCHS IS PART OF THE RESULT, NOT A KNOB TO HIDE. nnU-Net's PolyLR anneals to zero over
 # `num_epochs`, so a 100-epoch run is a COMPLETE schedule at its own length rather than a truncated
 # 1000-epoch one -- but reporting a short run as "nnU-Net's result" is the inadequate-baseline failure
 # named in arXiv 2404.09556. Every number this produces carries its epoch count and its GPU-hours.
 #
-# ⚠️ Results roots are SEPARATE per epoch budget, so a cheap run can never overwrite or be confused
+# Results roots are SEPARATE per epoch budget, so a cheap run can never overwrite or be confused
 # with an expensive one. frozen-wmh keeps the same separation.
 set -uo pipefail
 FOLD=${1:?usage: [EPOCHS=100] sbatch slurm/nnunet_train.sh <0-4> <configuration>}
@@ -34,14 +34,14 @@ CONFIG=${2:?usage: [EPOCHS=100] sbatch slurm/nnunet_train.sh <0-4> <configuratio
 case "$FOLD" in 0|1|2|3|4|all) ;; *) echo "FATAL: fold must be 0-4 or 'all' (got '$FOLD')" >&2; exit 1;; esac
 if [ "$FOLD" = all ]; then
     cat >&2 <<'WARN'
-⚠️  FOLD=all: this model CANNOT BE SCORED BY US. There is no held-out set left, so it produces no
+ FOLD=all: this model CANNOT BE SCORED BY US. There is no held-out set left, so it produces no
     comparable number and its `validation/` output is on data it trained on. Train it only from a
     recipe already settled on the folds, and keep reporting the fold-0 numbers.
 WARN
 fi
 EPOCHS="${EPOCHS:-100}"
 case "$EPOCHS" in ''|*[!0-9]*) echo "FATAL: EPOCHS must be an integer, got '$EPOCHS'" >&2; exit 1;; esac
-# ⚠️ 1000 epochs is nnU-Net's DEFAULT and therefore the PLAIN `nnUNetTrainer` -- there is no
+# 1000 epochs is nnU-Net's DEFAULT and therefore the PLAIN `nnUNetTrainer` -- there is no
 # `nnUNetTrainer_1000epochs` variant, because the base class already is one. Building the name
 # unconditionally sent a request for the default budget to a trainer that does not exist, and the
 # nearest shipped variant below it is 750. Anyone reaching for "the default" must get 1000.
@@ -53,7 +53,7 @@ case "$EPOCHS" in ''|*[!0-9]*) echo "FATAL: EPOCHS must be an integer, got '$EPO
 #
 #   TRAINER=nnUNetTrainerDA5 EPOCHS=250 sbatch slurm/nnunet_train.sh 0 3d_fullres
 #
-# ⚠️ A generated `X_250epochs` is comparable to `nnUNetTrainer_250epochs` and to NOTHING ELSE: an arm
+# A generated `X_250epochs` is comparable to `nnUNetTrainer_250epochs` and to NOTHING ELSE: an arm
 # at a different budget differs in two things at once. The plain 250-epoch run on Dataset510 is the
 # matched control for every 250-epoch arm, and it is already trained.
 GENERATE_FROM=""
@@ -78,7 +78,7 @@ module load httpproxy
 REPO=${REPO:-$HOME/frozen-isles}
 cd "$REPO" || { echo "FATAL: no repo at $REPO" >&2; exit 1; }
 
-# 🔴 ONE PERSISTENT ENVIRONMENT for every nnU-Net call in this script.
+# ONE PERSISTENT ENVIRONMENT for every nnU-Net call in this script.
 # `uv run --with nnunetv2` resolves per invocation and CAN rebuild between them: on 2026-08-06 job
 # 290413 generated a trainer into one environment, uv then reinstalled 99 packages, and the preflight
 # looked for it in a different one — "no trainer named ..." for a file that had just been written.
@@ -100,11 +100,11 @@ export nnUNet_preprocessed=$R/nnUNet_preprocessed
 export nnUNet_results=$R/nnUNet_results_${EPOCHS}ep
 mkdir -p "$nnUNet_results"
 
-# 🔴 STAGE THE PREPROCESSED DATA TO NODE-LOCAL DISK when the archive exists. /scratch fell to 8 MiB/s
+# STAGE THE PREPROCESSED DATA TO NODE-LOCAL DISK when the archive exists. /scratch fell to 8 MiB/s
 # on 2026-08-05 and had not recovered a day later; nnU-Net opens two files per case per iteration, so a
 # dataloader reading it directly starves and the GPU idles at 0% (measured: ~10 min/epoch against a
 # ~30 s steady state). Copying one archive converts thousands of small reads into one sequential read.
-# ⚠️ STAGE=0 disables it. When `slurm/io_probe.sh` reports normal on both axes, this is unnecessary —
+# STAGE=0 disables it. When `slurm/io_probe.sh` reports normal on both axes, this is unnecessary —
 # delete the archive and it turns itself off.
 ARCHIVE=$R/nnUNet_preprocessed.tar
 if [ "${STAGE:-1}" = 1 ] && [ -s "$ARCHIVE" ] && [ -n "${SLURM_TMPDIR:-}" ]; then
@@ -151,7 +151,7 @@ assert not (set(f['train']) & set(f['val'])), 'train and val overlap'
 fi
 
 # The generated trainer lives inside the INSTALLED nnunetv2 package. It is regenerated per job because
-# the venv can be rebuilt or deleted between jobs, and the script is idempotent. ⚠️ Generation, the
+# the venv can be rebuilt or deleted between jobs, and the script is idempotent. Generation, the
 # preflight and the training all use $PY_BIN so they share ONE environment — see the venv block above.
 if [ -n "$GENERATE_FROM" ]; then
     "$PY_BIN" scripts/make_nnunet_trainers.py "${GENERATE_FROM}:${EPOCHS}" \
@@ -184,14 +184,14 @@ echo "[foldrun] $nnUNet_results/$DATASET_DIR/${TRAINER}__${PLANS}__${CONFIG}/fol
 
 # torch.compile is nnU-Net's default and it HUNG two jobs on 2026-08-05, both immediately after the
 # first "Current learning rate" line, where the first forward triggers compilation.
-# ⚠️ **The likeliest cause is not compile.** `/scratch` throughput collapsed to ~8 MiB/s that evening
+# **The likeliest cause is not compile.** `/scratch` throughput collapsed to ~8 MiB/s that evening
 # and stayed there, which starves any read — including the cache files compilation writes and reads.
 # The same degradation explains the 10-minute epochs seen with compile already disabled.
-# ⚠️ An earlier note here blamed node-local storage differing by node family. That was WRONG:
+# An earlier note here blamed node-local storage differing by node family. That was WRONG:
 # `scontrol show node` reports identical `milan,a100,nvlink`, 510 GB, 48 CPUs across ng10xxx, ng20xxx
 # and ng30xxx, so there was never a hardware basis for it.
 # COMPILE=0 stays the default because a run that has to finish should not carry an unresolved suspect.
-# 🔬 **Once staging is confirmed working, COMPILE=1 is the cheap test** of whether compile was ever
+# **Once staging is confirmed working, COMPILE=1 is the cheap test** of whether compile was ever
 # implicated at all — with the data local, an inductor stall would no longer have an IO explanation.
 if [ "${COMPILE:-0}" = 1 ]; then
     export nnUNet_compile=true

@@ -4,7 +4,7 @@ PR-AUC is one of the five ranked metrics and it is defined over the SOFT map. `s
 back to the binary mask when no probabilities are given, which caps PR-AUC at what a thresholded map
 can reach — and that would understate nnU-Net in OUR favour, which is a worse comparison than none.
 
-⚠️ **The axis order is reversed and this script proves its own transpose.** nnU-Net stores
+**The axis order is reversed and this script proves its own transpose.** nnU-Net stores
 `probabilities` as `(class, z, y, x)` in its internal order while the exported NIfTI is `(x, y, z)`,
 so the foreground channel needs `transpose(2, 1, 0)`. Rather than trust that, every case asserts that
 thresholding the transposed map at 0.5 reproduces nnU-Net's OWN saved mask — a wrong transpose on a

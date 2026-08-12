@@ -97,7 +97,7 @@ def test_closing_adds_voxels_everywhere_except_the_volume_border():
     face of the volume, none deeper**. The affected shell grows with the radius, which is why the
     bound is stated in terms of it rather than as "the outermost layer".
 
-    ⚠️ This predates the iterated-dilation rewrite and is unchanged by it. It is pinned rather than
+    This predates the iterated-dilation rewrite and is unchanged by it. It is pinned rather than
     fixed because `border_value=1` would change every post-processing number, and a sweep was in
     flight. See `FIXME.md`.
     """

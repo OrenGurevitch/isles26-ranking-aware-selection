@@ -10,7 +10,7 @@ exactly as the container calls it, lands on the mask nnU-Net already wrote for a
       --images $R/nnUNet_raw/Dataset510_ISLES1453/imagesTr \\
       --validation $R/.../fold_0/validation --subjects 3
 
-⚠️ Agreement is not expected to be EXACT. nnU-Net's own validation predictions come from a different
+Agreement is not expected to be EXACT. nnU-Net's own validation predictions come from a different
 entry point with its own resampling and Gaussian accumulation, and mirroring makes the arithmetic
 order-dependent. A wrong transpose is not a near-miss though — it moves Dice to near zero — so the
 threshold below separates the two cases with room to spare rather than pretending to bit-equality.

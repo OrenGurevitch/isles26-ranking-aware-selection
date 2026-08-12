@@ -12,11 +12,11 @@
 #
 #   sbatch slurm/verify_container_nnunet.sh [EPOCHS] [SUBJECTS]
 #
-# ⚠️ THIS IS THE GATE ON SUBMITTING THE nnU-Net ARM. The failure it guards is silent -- a wrong axis
+# THIS IS THE GATE ON SUBMITTING THE nnU-Net ARM. The failure it guards is silent -- a wrong axis
 # order segments something, it just segments the wrong thing -- so nothing downstream would catch it
 # and we get ONE test-phase submission.
 #
-# ⚠️ It also prints the per-case wallclock, which is the only real evidence about the 10-minute
+# It also prints the per-case wallclock, which is the only real evidence about the 10-minute
 # budget we can get before the sanity phase reports it on the actual T4. A GPU here is an A100, so
 # treat the number as a floor, never as the T4 time.
 set -uo pipefail
@@ -42,7 +42,7 @@ module load httpproxy
 
 R=/scratch/orengur2/nnunet_isles
 DATASET=Dataset510_ISLES1453
-# ⚠️ The trainer directory carries the EPOCH COUNT in its name (nnUNetTrainer_250epochs__...), so a
+# The trainer directory carries the EPOCH COUNT in its name (nnUNetTrainer_250epochs__...), so a
 # hardcoded `nnUNetTrainer__nnUNetPlans__3d_fullres` resolves for exactly one budget and silently
 # fails for every other. Resolve it, and refuse an ambiguous match rather than picking one.
 mapfile -t CANDIDATES < <(find "$R/nnUNet_results_${EPOCHS}ep/$DATASET" -maxdepth 1 -type d \
@@ -57,7 +57,7 @@ echo "[env] $(date) node=$(hostname) epochs=$EPOCHS subjects=$SUBJECTS plans=$PL
 echo "[model] $MODEL"
 nvidia-smi --query-gpu=name,memory.total --format=csv
 
-# ⚠️ The trainer the checkpoint names must exist in THIS environment. `make_nnunet_trainers.py` writes
+# The trainer the checkpoint names must exist in THIS environment. `make_nnunet_trainers.py` writes
 # it into the installed nnunetv2, and `uv run --with` resolves a fresh environment per invocation, so
 # generating and using it in two separate `uv run` calls is a race this project has already lost once.
 # Generate it here, in the same interpreter that is about to load the model.

@@ -9,11 +9,11 @@ This resamples the SUBJECTS with replacement, recomputing the full per-case rank
 Pairing is what makes it informative: every arm is re-ranked on the same resampled cohort, so the
 shared per-subject difficulty cancels and what remains is the arms disagreeing.
 
-⚠️ **Ranks are recomputed per draw, never averaged from the full-cohort ranking.** Rank-then-aggregate
+**Ranks are recomputed per draw, never averaged from the full-cohort ranking.** Rank-then-aggregate
 is not a per-subject statistic that can be resampled directly — a case's rank depends on which arms it
 is scored against, so the ranking must be rebuilt inside the draw or the interval is meaningless.
 
-⚠️ A rank here is only a rank AMONG THESE ARMS, on this fold. It says nothing about the leaderboard.
+A rank here is only a rank AMONG THESE ARMS, on this fold. It says nothing about the leaderboard.
 
   uv run python scripts/bootstrap_arm_ranking.py scores_topk10_250-da5_250-plain250.json \\
       --against plain250

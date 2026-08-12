@@ -11,7 +11,7 @@
 #
 #   sbatch slurm/stage_preprocessed.sh
 #
-# 🔴 **Why.** `/scratch` degraded to 7-17 MiB/s on 2026-08-05 and had not recovered 13 hours later.
+# **Why.** `/scratch` degraded to 7-17 MiB/s on 2026-08-05 and had not recovered 13 hours later.
 # Sequential throughput is only half the problem: a `du -sh` over the 2,906 preprocessed files took
 # more than eight minutes, so METADATA operations are crawling too. nnU-Net opens two files per case
 # per iteration, which is the shape that produces 10-minute epochs against a 30-second steady state.
@@ -20,9 +20,9 @@
 # read from `$SLURM_TMPDIR` (node-local NVMe, 805 GB free on Narval GPU nodes). One archive costs one
 # open instead of thousands.
 #
-# ⚠️ This is a WORKAROUND for a degraded filesystem, not an improvement to keep forever. When
+# This is a WORKAROUND for a degraded filesystem, not an improvement to keep forever. When
 # `slurm/io_probe.sh` reads normal again, training directly from `/scratch` is simpler and the archive
-# is one more thing that can go stale. ⚠️ Regenerate it if the preprocessing is ever rerun.
+# is one more thing that can go stale. Regenerate it if the preprocessing is ever rerun.
 set -uo pipefail
 R=/scratch/orengur2/nnunet_isles
 SRC=$R/nnUNet_preprocessed
@@ -36,7 +36,7 @@ if [ -s "$DEST" ]; then
 fi
 
 echo "[env] $(date) node=$(hostname) dataset=$DATASET"
-# ⚠️ ONLY what training reads. The dataset directory is ~17.8 GB, of which `nnUNetPlans_2d` is 9.7 GB
+# ONLY what training reads. The dataset directory is ~17.8 GB, of which `nnUNetPlans_2d` is 9.7 GB
 # that we never train — every arm here is `3d_fullres`. Packing it would add ~20 min to this job AND to
 # every job that stages the archive. Add it back here if a 2d arm is ever run.
 CONFIG_DIR=${CONFIG_DIR:-nnUNetPlans_3d_fullres}
