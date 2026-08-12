@@ -1,0 +1,63 @@
+# ISLES'26 submission container: the nnU-Net baseline.
+#
+# This is the arm that currently WINS the ranking (docs/RESULTS.md), so it is the one most likely to
+# be submitted. It shares `container/run.py` with the probe container, so the degradation ladder is
+# the same code in both, not two copies drifting apart.
+#
+# OFFLINE AT INFERENCE. The trained fold is baked in by scripts/stage_nnunet_container_weights.py;
+# nothing is downloaded when the container runs.
+#
+# --platform=linux/amd64 is required by the platform and is a cross-build on Apple Silicon.
+FROM --platform=linux/amd64 pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+
+ENV PYTHONUNBUFFERED=1
+# A T4 is Turing: fp16 tensor cores, no bfloat16. Nothing here may assume otherwise.
+
+# nnunetv2 requires torch>=2.1.2, which the base image already satisfies, so pip leaves the CUDA
+# build in place. ⚠️ If a future nnunetv2 raises that floor above 2.5.1, pip will silently pull a
+# generic torch wheel and the image loses its CUDA runtime — check `torch.version.cuda` in the smoke
+# test rather than assuming.
+RUN pip install --no-cache-dir nnunetv2 "SimpleITK>=2.5"
+
+# nnU-Net reads these at import and complains when they are unset. Inference never touches them --
+# the model folder is passed explicitly -- so they point somewhere harmless and writable.
+ENV nnUNet_raw=/tmp/nnunet nnUNet_preprocessed=/tmp/nnunet nnUNet_results=/tmp/nnunet
+
+# 🔴 THE SUBMITTED CHECKPOINT NAMES A TRAINER nnU-NET DOES NOT SHIP, and nnU-Net imports it by name.
+# `initialize_from_trained_model_folder` reads the trainer out of the checkpoint and calls
+# `recursive_find_trainer_class_by_name`, so a stock install raises at model load, before any case
+# runs. nnU-Net ships the epoch variants and the loss variants but not their cross product, and
+# `nnUNetTrainerDiceTopK10Loss_1000epochs` is the cross product we train with.
+#
+# ⚠️ This is why "the entrypoint loads whatever is staged and never names a trainer" was the wrong
+# reading of what the recipe swap costs: the ENTRYPOINT does not name it, the CHECKPOINT does. The
+# previous container shipped `nnUNetTrainer_500epochs`, which nnU-Net does ship, so the same code
+# worked by luck of the recipe rather than by design. Verified inside the built image 2026-08-11.
+#
+# Generated with the same script the training jobs use, so the class the container imports and the
+# class that trained the weights come from one definition rather than two.
+COPY --chown=root:root scripts/make_nnunet_trainers.py /tmp/make_nnunet_trainers.py
+RUN python /tmp/make_nnunet_trainers.py nnUNetTrainerDiceTopK10Loss:1000 \
+ && python -c "from nnunetv2.utilities.find_objects import recursive_find_trainer_class_by_name as f; \
+f('nnUNetTrainerDiceTopK10Loss_1000epochs'); print('[build] trainer resolves')" \
+ && rm /tmp/make_nnunet_trainers.py
+
+RUN groupadd -r user && useradd -m --no-log-init -r -g user user
+WORKDIR /opt/app
+
+# frozen_isles.metrics is deliberately absent: it pulls panoptica, which pins numpy<2, and nothing at
+# inference time scores anything. Only gcio is needed here -- no features, no probe.
+COPY --chown=user:user frozen_isles/__init__.py /opt/app/frozen_isles/
+COPY --chown=user:user frozen_isles/gcio /opt/app/frozen_isles/gcio
+# ⚠️ REQUIRED: container/run.py post-processes the mask through this module. Omitting it
+# fails at IMPORT, before a single case runs -- which is the loud failure we want, but it
+# is invisible to the local test suite, where the whole package is on the path.
+COPY --chown=user:user frozen_isles/postprocess /opt/app/frozen_isles/postprocess
+COPY --chown=user:user container/__init__.py container/run.py container/inference_nnunet.py /opt/app/container/
+
+# The trained fold, staged by scripts/stage_nnunet_container_weights.py before the build.
+COPY --chown=user:user container/resources_nnunet /opt/app/resources/nnunet
+
+USER user
+ENV PYTHONPATH=/opt/app
+ENTRYPOINT ["python", "-m", "container.inference_nnunet"]

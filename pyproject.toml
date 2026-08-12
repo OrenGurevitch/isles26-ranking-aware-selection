@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Required because the distribution name and the import name differ: hatchling infers the package
+# from the project name, and there is no `isles26_ranking_aware_selection` directory. The import
+# name is kept as `frozen_isles` so the container path baked into Dockerfile.nnunet, and the build
+# verified at 0.9975-1.0000 agreement, do not have to be re-verified for a rename.
+[tool.hatch.build.targets.wheel]
+packages = ["frozen_isles"]
+
+[project]
+name = "isles26-ranking-aware-selection"
+version = "1.0.0"
+description = "Ranking-aware model selection for stroke lesion segmentation on native-space T1w MRI (ISLES'26 / ATLAS v3.0)."
+readme = "README.md"
+# Pinned BELOW 3.13 deliberately. panoptica 1.0.1 requires numpy<2, and numpy 1.26 has no cp313
+# wheel — so on 3.13 every environment resolved from this file builds numpy from source, which broke
+# the Docker build (no compiler) and produced an unimportable numpy on the cluster.
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "nibabel>=5.3.3",
+    # numpy<2 is forced by panoptica 1.0.1, pinned below. Do not "modernise" it, and do not raise
+    # requires-python past 3.12 — see the note there.
+    "numpy>=1.26,<2",
+    # panoptica + scikit-learn ARE the ranking metrics (see frozen_isles/metrics) — not helpers.
+    # panoptica is pinned to the EXACT version in the organizers' requirements.txt: RQ and
+    # global_bin_dsc are what the leaderboard computes, and 2.x is a different implementation.
+    "panoptica==1.0.1",
+    "scikit-learn>=1.7.0",
+    "scipy>=1.17.1",
+    "simpleitk>=2.5.5",
+    # Torch capped at <2.11: 2.11 ships CUDA 13 wheels only, and the A100 nodes this ran on use a
+    # CUDA 12.8 driver → silent CPU fallback. Bump only after checking the driver.
+    "torch>=2.10,<2.11",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.38.1",
+    "pytest>=9.0.2",
+    "ruff>=0.15.2",
+    "rust-just>=1.46.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "TCH"]
+
+[tool.basedpyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+reportPrivateImportUsage = false
+reportAttributeAccessIssue = "warning"
+reportMissingModuleSource = false
+exclude = ["references", ".venv"]
+
+[tool.pytest.ini_options]
+python_files = ["test.py", "test_*.py"]
